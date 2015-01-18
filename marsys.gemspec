@@ -10,4 +10,5 @@ Gem::Specification.new do |s|
   s.homepage    = 'http://rubygems.org/gems/marsys'
   s.license     = 'CC'
   s.add_runtime_dependency "activesupport", ["= 4.2.0"]
+  s.add_runtime_dependency "colorize", ["= 0.7.5"]
 end
