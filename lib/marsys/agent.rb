@@ -28,18 +28,8 @@ class Marsys::Agent
     @square.content = self if @old_square # update square content if @old_square exists (fish has moved)
   end
 
-  def give_birth
-    @breeding += 1
-    if @breeding > @breeding_time && @old_square # breeding time reached and old square not nil (so exists)
-      @breeding = 0
-      new_agent = self.class.new(@environment,@old_square)
-      collection << new_agent
-    end 
-  end
-
   def turn
     move
-    give_birth
     @age += 1
   end
 
