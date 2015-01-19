@@ -29,6 +29,10 @@ class Marsys::Core
     end
   end
 
+  def display
+    @environment.display
+  end
+
   Symbol.class_eval do
     def pluralize
       to_s.pluralize.to_sym
