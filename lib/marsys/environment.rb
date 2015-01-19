@@ -2,14 +2,13 @@ require 'pp'
 require 'json'
 
 class Marsys::Environment
-  attr_accessor :grid, :agents
+  attr_accessor :grid, :agents_type
 
   def initialize(agents=[])
-    @agents = agents
+    @agents_type = agents
 
     # create accessors for each type of agents
-    @agents.each do |type|
-      puts "Create accessors for agent #{type.to_s}"
+    @agents_type.each do |type|
       self.class.send(:attr_accessor, type.pluralize)
 
       # init agent collection with empty Array
@@ -34,7 +33,7 @@ class Marsys::Environment
     # init agents on grid
     squares = @grid.clone.flatten
 
-    @agents.each do |type|
+    @agents_type.each do |type|
       (Marsys::Settings.params["#{type}_population".to_sym] || @population).times {
         agent = type.to_s.capitalize.constantize.new(self)    # create new agent
         self.send(type.pluralize).send(:push, agent)          # store agent in its collection
@@ -46,7 +45,11 @@ class Marsys::Environment
 
     # init methods specific to agents
     create_agents_specific_methods
-    
+  end
+
+  def agents
+    # init @agents instance variable
+    @agents_type.map{|type| self.send(type.pluralize)}.flatten
   end
 
   def to_json(options = {})
@@ -56,7 +59,7 @@ class Marsys::Environment
       }},
       iteration: @iteration
     }
-    @agents.each do |type|
+    @agents_type.each do |type|
       json[type.pluralize] = self.send(type.pluralize)                      # add collection of agents of this type
       json["#{type}s_census".to_sym] = self.send("#{type}s_census".to_sym)  # add census informations for agents of this type
     end
@@ -66,7 +69,7 @@ class Marsys::Environment
 
   def turn
     @iteration += 1
-    @agents.map{|type| self.send(type.pluralize)}.flatten.shuffle.each{ |agent| agent.turn }
+    agents.shuffle.each{ |agent| agent.turn }
   end
 
   def display
@@ -75,12 +78,12 @@ class Marsys::Environment
   end
 
   def display_grid
-    puts @grid.inject(""){ |res,line| res + line.inject(""){ |res,square| res + square.char + " " } + "\n" } + "__" * @size + "\n"
+    puts "__" * @size + "\n" + @grid.inject(""){ |res,line| res + line.inject(""){ |res,square| res + square.char + " " } + "\n" } + "__" * @size + "\n"
   end
 
   def display_stats
     puts "Agents population : #{@grid.flatten.reject{|s| s.content.nil?}.count}"
-    @agents.each do |type|
+    @agents_type.each do |type|
       puts "#{type.to_s.pluralize.capitalize} population  : #{self.send(type.pluralize).count}"
     end
   end
@@ -107,7 +110,7 @@ class Marsys::Environment
     end
 
     def squares_around_with_initialize
-      @agents.each do |type|
+      @agents_type.each do |type|
         self.class.send( :define_method, "squares_around_with_#{type}", Proc.new{ |argument|
           squares_around(argument).select{ |s| s.content.is_a? type.to_s.capitalize.constantize }
         })
@@ -115,8 +118,9 @@ class Marsys::Environment
     end
 
     def census_initialize
-      @agents.each do |type|
-        puts "Create method #{type.pluralize}_census"
+      @agents_type.each do |type|
+        # Create method #{type.pluralize}_census which return an Array
+        # with population of type for each age range
         self.class.send( :define_method, "#{type.pluralize}_census", Proc.new{
           self.send(type.pluralize).census
         })

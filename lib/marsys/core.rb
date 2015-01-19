@@ -2,20 +2,26 @@ require 'active_support'
 require 'active_support/inflector'
 
 class Marsys::Core
-  attr_accessor :environment
+  attr_accessor :environment, :iteration
 
   def initialize(options={})
     Marsys::Settings.load!("config.yml")
     Marsys::Settings.params.merge! options              # override default settings
+    @iteration = 0
     @iterations = Marsys::Settings.params[:iterations]
     @environment ||= Marsys::Environment.new(@agents)   # init environment if necessary
   end
 
   def run
-    @iterations.times {
+    while ( !(self.stop_condition) ) do
       @environment.turn
-      @environment.display
-    }
+      self.display
+      @iteration += 1
+    end 
+  end
+
+  def stop_condition
+    @iterations <= @iteration
   end
 
   def display_config
