@@ -9,7 +9,11 @@ class Marsys::Core
     Marsys::Settings.params.merge! options              # override default settings
     @iteration = 0
     @iterations = Marsys::Settings.params[:iterations]
-    @environment ||= Marsys::Environment.new(@agents)   # init environment if necessary
+    @environment ||= Marsys::Environment.new(@agents, options)   # init environment if necessary
+  end
+
+  def to_json(options = {})
+    @environment.to_json(options)
   end
 
   def run
