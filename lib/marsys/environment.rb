@@ -2,12 +2,13 @@ require 'pp'
 require 'json'
 
 class Marsys::Environment
-  attr_accessor :grid, :agents_type
+  attr_accessor :grid, :agents_type, :toric
 
   def initialize(agents=[], options={})
-    Marsys::Settings.load!("config.yml")    # load default settings
-    Marsys::Settings.params.merge! options  # override default settings
-
+    Marsys::Settings.load!("config.yml")
+    Marsys::Settings.params.merge! options
+    
+    @toric = true
     @agents_type = agents
 
     # create accessors for each type of agents
@@ -17,6 +18,7 @@ class Marsys::Environment
       # init agent collection with empty Array
       self.send("#{type.pluralize}=", [])
     end
+
 
     pp Marsys::Settings.params
 
@@ -57,10 +59,9 @@ class Marsys::Environment
 
   def to_json(options = {})
     {
-      grid:       @grid.map{|line| line.map{ |square|
-                    square.content ? square.content.class.to_s.downcase : nil
-                  }},
-      iteration:  @iteration
+    grid:@grid.map{|line| line.map{ |square|square.content ? square.content.class.to_s.downcase : nil
+    }},
+    iteration:  @iteration
     }.to_json
   end
 
@@ -86,58 +87,89 @@ class Marsys::Environment
     @grid.flatten.select{ |s| s.content.nil? }
   end
 
+
+
   def squares_around square
+   if(!@toric)
     squares = []
     (([0,square.x-1].max)..([@size-1,square.x+1].min)).each do |x|
       (([0,square.y-1].max)..([@size-1,square.y+1].min)).each do |y|
         squares << @grid[x][y] unless x == square.x && y == square.y
       end
     end
-    squares
+  else
+    squares = squares_around_toric(square)  
+ end
+ squares
+end
+
+def squares_around_toric square
+  squares = []
+  ((square.x-1)..(square.x+1)).each do |x|
+    ((square.y-1)..(square.y+1)).each do |y|
+     i = square.x
+     j = square.y
+     if (square.x-1)
+       i = @size-1 
+     elsif (square.x+1)
+       i = 0 
+     end
+     if (square.y-1)
+       i = @size-1 
+     elsif (square.y+1) 
+       i = 0 
+     end
+     squares << @grid[i][j] unless x == square.x && y == square.y
+   end
+ end
+ squares
+end
+
+
+
+def empty_squares_around square
+  squares_around(square).select{ |s| s.content.nil? }
+end
+
+
+private
+
+def create_agents_specific_methods
+  squares_around_with_initialize
+end
+
+def self.initialize_methods(*names)
+  names.each do |name|
+    self.send(name)
+  end
+end
+
+def squares_around_with_initialize
+ @agents_type.each do |type|
+   self.class.send( :define_method, "squares_around_with_#{type}", Proc.new{ |argument|
+     squares_around(argument).select{ |s| s.content.is_a? type.to_s.capitalize.constantize }
+     })
+ end
+end
+
+def census_initialize
+
+end
+
+class Square
+  attr_accessor :x,:y,:content
+
+  def initialize(x,y)
+    @size = Marsys::Settings.params[:dimensions]
+    raise SquareOutOfRangeException.new unless ((0..(@size-1)).include?(x) || (0..(@size-1)).include?(y))
+    @x, @y = x, y
   end
 
-  def empty_squares_around square
-    squares_around(square).select{ |s| s.content.nil? }
-  end
-
-  private
-
-    def create_agents_specific_methods
-      squares_around_with_initialize
-    end
-
-    def self.initialize_methods(*names)
-      names.each do |name|
-        self.send(name)
-      end
-    end
-
-    def squares_around_with_initialize
-      @agents_type.each do |type|
-        self.class.send( :define_method, "squares_around_with_#{type}", Proc.new{ |argument|
-          squares_around(argument).select{ |s| s.content.is_a? type.to_s.capitalize.constantize }
-        })
-      end
-    end
-
-    def census_initialize
-
-    end
-
-  class Square
-    attr_accessor :x,:y,:content
-
-    def initialize(x,y)
-      @size = Marsys::Settings.params[:dimensions]
-      raise SquareOutOfRangeException.new unless ((0..(@size-1)).include?(x) || (0..(@size-1)).include?(y))
-      @x, @y = x, y
-    end
-
-    def to_json(options = {})
-      {
-        content:  @content,
-        x:        @x,
-        y:        @y
+  def to_json(options = {})
+    {
+      content:  @content,
+      x:        @x,
+      y:        @y
       }.to_json
     end
 
