@@ -27,21 +27,21 @@ Then require it, and extend Marsys classes
 require 'marsys'
 
 class Core < Marsys::Core
-	def initialize(options={})
-    @agents = [:blue, :green]												# set the different types of agents
+  def initialize(options={})
+    @agents = [:blue, :green]                       # set the different types of agents
     @environment = Environment.new(@agents,options) # instanciate your environment
     super(options)
   end
 end
 
 class Environment < Marsys::Environment
-
+  # puts methods which acts on your environment here
 end
 
 class Agent < Marsys::Agent
-					 																					# set stuffs to do here before or 
-	def turn																					# after the parent class
-		puts "Hey ! I'm a #{self.class.to_s} agent"
+                                                 # set here stuffs to do before or 
+  def turn                                       # after the parent class
+    puts "Hey ! I'm a #{self.class.to_s} agent"
     super
     puts "I'm always a #{self.class.to_s} agent, yeah !"
   end
@@ -50,7 +50,7 @@ end
 class Blue < Agent
   def initialize(environment, square = nil)
     super(environment, square)
-    @color = :blue 																	# set color of your agent
+    @color = :blue                                # set color of your agent
   end
 end
 

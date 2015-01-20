@@ -5,11 +5,11 @@ class Marsys::Core
   attr_accessor :environment, :iteration
 
   def initialize(options={})
-    Marsys::Settings.load!("config.yml")
-    Marsys::Settings.params.merge! options              # override default settings
+    @environment ||= Marsys::Environment.new(@agents, options)  # init environment unless done
+    # Marsys::Settings.load!("config.yml")
+    # Marsys::Settings.params.merge! options                      
     @iteration = 0
     @iterations = Marsys::Settings.params[:iterations]
-    @environment ||= Marsys::Environment.new(@agents, options)   # init environment if necessary
   end
 
   def to_json(options = {})

@@ -5,8 +5,8 @@ class Marsys::Environment
   attr_accessor :grid, :agents_type
 
   def initialize(agents=[], options={})
-    Marsys::Settings.load!("config.yml")
-    Marsys::Settings.params.merge! options
+    Marsys::Settings.load!("config.yml")    # load default settings
+    Marsys::Settings.params.merge! options  # override default settings
 
     @agents_type = agents
 
