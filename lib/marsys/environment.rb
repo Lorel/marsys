@@ -61,7 +61,7 @@ class Marsys::Environment
                     square.content ? square.content.class.to_s.downcase : nil
                   }},
       iteration:  @iteration
-    }.merge(add_hash_to_json).to_json
+    }.merge(options).merge(self.add_hash_to_json).to_json
   end
   def add_hash_to_json; {}; end
 

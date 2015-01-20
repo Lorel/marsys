@@ -16,7 +16,7 @@ class Marsys::Agent
     {
       type: self.class.to_s.downcase,
       color: @color.to_s
-    }.merge(add_hash_to_json).to_json
+    }.merge(self.add_hash_to_json).to_json
   end
   def add_hash_to_json; {}; end
 
