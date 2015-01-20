@@ -17,14 +17,14 @@ class Marsys::Core
   end
 
   def run
-    while ( !(self.stop_condition) ) do
+    while ( !(self.stop_condition?) ) do
       @environment.turn
       self.display
       @iteration += 1
     end 
   end
 
-  def stop_condition
+  def stop_condition?
     @iterations <= @iteration
   end
 
