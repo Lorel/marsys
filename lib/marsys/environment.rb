@@ -120,10 +120,6 @@ class Marsys::Environment
       end
     end
 
-    def census_initialize
-
-    end
-
   class Square
     attr_accessor :x,:y,:content
 
