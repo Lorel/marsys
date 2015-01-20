@@ -49,4 +49,9 @@ class Marsys::Core
       to_s.pluralize.to_sym
     end    
   end
+
+  def self.run!
+    core = self.new
+    core.run
+  end
 end
