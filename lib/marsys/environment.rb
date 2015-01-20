@@ -61,8 +61,9 @@ class Marsys::Environment
                     square.content ? square.content.class.to_s.downcase : nil
                   }},
       iteration:  @iteration
-    }.to_json
+    }.merge(add_hash_to_json).to_json
   end
+  def add_hash_to_json; {}; end
 
   def turn
     @iteration += 1
@@ -139,7 +140,7 @@ class Marsys::Environment
         x:        @x,
         y:        @y
       }.to_json
-    end
+    end # define add_hash_to_json ??
 
     def char
       @content ? @content.char : "-"

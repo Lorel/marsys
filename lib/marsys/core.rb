@@ -13,8 +13,9 @@ class Marsys::Core
   end
 
   def to_json(options = {})
-    @environment.to_json(options)
+    @environment.merge(add_hash_to_json).to_json(options)
   end
+  def add_hash_to_json; {}; end
 
   def run
     while ( !(self.stop_condition?) ) do
