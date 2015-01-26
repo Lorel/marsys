@@ -20,24 +20,24 @@ class Marsys::Agent
 
   def move ; end
 
-  def move_close
+  def move_to square
     @old_square = @square
-    @square = @environment.empty_squares_around(@square).sample || @old_square
+    @square = square
     @old_square = nil if @old_square == @square # no old_square if agent does not move
     @old_square.content = nil if @old_square # reset old_square content if @old_square exists (agent has moved)
     @square.content = self if @old_square # update square content if @old_square exists (agent has moved)
+  end
+
+  def move_close
+    move_to( @environment.empty_squares_around(@square).sample || @old_square )
   end
 
   def move_far
-    @old_square = @square
-    @square = @environment.empty_squares.sample || @old_square
-    @old_square = nil if @old_square == @square # no old_square if agent does not move
-    @old_square.content = nil if @old_square # reset old_square content if @old_square exists (agent has moved)
-    @square.content = self if @old_square # update square content if @old_square exists (agent has moved)
+    move_to( @environment.empty_squares.sample || @old_square )
   end
 
   def turn
-    move
+    self.move
   end
 
   def collection

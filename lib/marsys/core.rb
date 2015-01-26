@@ -5,6 +5,7 @@ class Marsys::Core
   attr_accessor :environment, :iteration
 
   def initialize(options={})
+    @agents ||= []
     @environment ||= Marsys::Environment.new(@agents, options)  # init environment unless done
     # Marsys::Settings.load!("config.yml")
     # Marsys::Settings.params.merge! options                      
