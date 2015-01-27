@@ -72,3 +72,4 @@ core.run
 
 - implementation of Wator : https://github.com/Lorel/wator_rb
 - implementation of Schelling Segregation Model : https://github.com/Lorel/segregation_rb
+- implementation of Stalker, a wicked follower story : https://github.com/Lorel/stalker_rb
