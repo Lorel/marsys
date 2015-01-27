@@ -2,13 +2,13 @@ require 'pp'
 require 'json'
 
 class Marsys::Environment
-  attr_accessor :grid, :agents_type
+  attr_accessor :grid, :agents_type, :size
 
-  def initialize(agents=[], options={})
+  def initialize(agents_type=[], options={})
     Marsys::Settings.load!("config.yml")    # load default settings
     Marsys::Settings.params.merge! options  # override default settings
 
-    @agents_type = agents
+    @agents_type = agents_type
 
     # create accessors for each type of agents
     @agents_type.each do |type|
